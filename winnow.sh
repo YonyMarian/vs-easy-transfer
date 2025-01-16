@@ -16,7 +16,7 @@ function winnow() {
 	local source="$1"
 	local target="${@: -1}"
 	# check that the directories exist
-	if [[ ! -d "./${source}" ]] || [[ ! -d "./${directory}" ]]; then
+	if [[ ! -d "${source}" ]] || [[ ! -d "${directory}" ]]; then
 		echo "Could not find one or both of the directories."
 		return
 	fi
@@ -25,13 +25,13 @@ function winnow() {
 	for file_ext in ${@:2:num_exts}
 	do
 		echo "Attempting to copy ${file_ext} files..."
-		cp -t "./${target}/" "./${source}/"*"${file_ext}" || echo -e "\tNo ${file_ext} files found in ${source}"
+		cp -t "${target}/" "${source}/"*"${file_ext}" || echo -e "\tNo ${file_ext} files found in ${source}"
 	done
 	echo -e "Copied available requested filetypes to ${target}"
-	read -p "Would you like to add ${source} to git? [y/n] : " git_ans
+	read -p "Would you like to add ${target} to git? [y/n] : " git_ans
 	case "$git_ans" in
 		"y")
-			git add "./${source}"
+			git add "${target}"
 			git status ;;
 		"n")
 			echo "Git will not track these changes." ;;
