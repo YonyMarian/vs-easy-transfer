@@ -18,7 +18,7 @@ function transfer_to_winscp() { # <username> <password> <directory_name>
 	echo "open sftp://${connection}" >> "${winscp_script}"
 	echo "option batch on" >> "${winscp_script}"
 	echo "option confirm off" >> "${winscp_script}"
-	echo "synchronize remote ./${dir_name} ${remote_path}${dir_name}" >> "${winscp_script}"
+	echo "synchronize remote ${dir_name} ${remote_path}${dir_name}" >> "${winscp_script}"
 	echo "exit" >> "${winscp_script}"
 
 	# execute the script in WinSCP
