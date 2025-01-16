@@ -16,7 +16,7 @@ function winnow() {
 	local source="$1"
 	local target="${@: -1}"
 	# check that the directories exist
-	if [[ ! -d "${source}" ]] || [[ ! -d "${directory}" ]]; then
+	if [[ ! -d "./${source}" ]] || [[ ! -d "./${directory}" ]]; then
 		echo "Could not find one or both of the directories."
 		return;
 	fi

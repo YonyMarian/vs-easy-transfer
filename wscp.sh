@@ -5,27 +5,33 @@
 # Opens WinSCP and transfers files
 function transfer_to_winscp() { # <username> <password> <directory_name>
 	if [[ "$#" -ne 3 ]]; then
-		echo "Bad arguments passed to open_winscp()"
+		echo "Bad arguments passed to transfer_to_winscp()"
 		return;
 	fi
 	local username="$1"
 	local password="$2"
-	local dirname="$3"
-	local hostname="${CLASS}.${URL_TAIL}" # from env_vars.txt
-	local remote_path="${REMOTE_PATH_PREFIX}" # from env_vars.txt
+	local dir_name="$3"
+	local hostname="${HOSTNAME}"
+	local remote_path="${REMOTE_PATH_PREFIX}"
 	local sftp_connection="$username:$password@$hostname"
 
 	# create WinSCP temp script to open with
 	local winscp_script=$(mktemp)
-	echo "open sftp://${connection}" >> "${winscp_script}"
-	echo "option batch on" >> "${winscp_script}"
-	echo "option confirm off" >> "${winscp_script}"
-	echo "synchronize remote ${dir_name} ${remote_path}${dir_name}" >> "${winscp_script}"
-	echo "exit" >> "${winscp_script}"
+
+
+# WinSCP script for transferring files
+	cat <<EOF > "$winscp_script"
+open sftp://"${sftp_connection}"
+option batch on
+option confirm off
+mkdir "${remote_path}${dir_name}"
+synchronize remote "${dir_name}" "${remote_path}${dir_name}"
+exit
+EOF
 
 	# execute the script in WinSCP
 	echo "Opening WinSCP and syncing files..."
-	winscp.com /script="$winscp_script"
+	winscp.com -script="$winscp_script"
 	echo "The remote directory is now up-to-date."
 	rm -f "$winscp_script"
 }
@@ -59,8 +65,10 @@ function main() {
 	fi
 	echo
 	echo "Searching for constants in ~/.bashrc."
+	source ~/.bashrc
 	echo "Preparing to open WinSCP..."
-	transfer_to_winscp "$username" "$password" "$dir_name"
+	transfer_to_winscp "${username}" "${password}" "${dir_name}"
+	echo "File transfer complete. Don't forget to close off any connections when you're done!"
 }
 
 main "$@"
