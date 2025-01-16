@@ -9,7 +9,7 @@ function winnow() {
 	# must be at least one source, one file ext, one target
 	if [[ "$#" -lt 3 ]]; then
 		echo "${USAGE_GUIDELINES}"
-		return
+		return;
 	fi
 
 	# set local variables
@@ -18,7 +18,7 @@ function winnow() {
 	# check that the directories exist
 	if [[ ! -d "${source}" ]] || [[ ! -d "${directory}" ]]; then
 		echo "Could not find one or both of the directories."
-		return
+		return;
 	fi
 	local num_exts=$(( $#-2 )) # the number of extensions, i.e., the middle ones
 	# copy files

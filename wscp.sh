@@ -1,11 +1,13 @@
 #!/bin/bash
 
+# don't forget to define your constants! See the README.md for more details.
 
 # Opens WinSCP and transfers files
 function transfer_to_winscp() { # <username> <password> <directory_name>
 	if [[ "$#" -ne 3 ]]; then
 		echo "Bad arguments passed to open_winscp()"
-		return
+		return;
+	fi
 	local username="$1"
 	local password="$2"
 	local dirname="$3"
@@ -33,27 +35,33 @@ function main() {
 	# check for correct args
 	if [[ "$#" -ne 1 ]]; then
 		echo "usage: wcsp <directory_name>"
-		return
+		return;
 	fi
 	local dir_name="$1"
 	if [[ ! -d "$1" ]]; then
 		echo -e "Could not find directory: \'${1}\'"
-		return
+		return;
 	fi
 	# prompt for username
 	local dir_name="$1"
-	read -p "Enter username: " username
+	printf "Enter username: "
+	read -r username
 	if [[ ! "$username" ]]; then
 		echo "You must enter a username."
-		return
+		return;
 	fi
 	# prompt for password
-	read -p -s "Enter password: " password
+	printf "Enter password: "
+	read -rs password
 	if [[ ! "$password" ]]; then
 		echo "You must enter a password."
-	# source constants, if found
-	source env_vars.txt || return
-	echo "Using constants in env_vars.txt."
+		return;
+	fi
+	echo
+	echo "Searching for constants in ~/.bashrc."
 	echo "Preparing to open WinSCP..."
 	transfer_to_winscp "$username" "$password" "$dir_name"
 }
+
+main "$@"
+
