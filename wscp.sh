@@ -5,14 +5,14 @@
 # Opens WinSCP and transfers files
 function transfer_to_winscp() { # <username> <password> <directory_name>
 	if [[ "$#" -ne 3 ]]; then
-		echo "Bad arguments passed to transfer_to_winscp()"
+		echo "Bad arguments passed to transfer_to_winscp()."
 		return;
 	fi
 	local username="$1"
 	local password="$2"
 	local dir_name="$3"
-	local hostname="${HOSTNAME}"
-	local remote_path="${REMOTE_PATH_PREFIX}"
+	local hostname="${CLASS}.${URL}"
+	local remote_path="${REMOTE_PATH_PREFIX}${CLASS}/"
 	local sftp_connection="$username:$password@$hostname"
 
 	# create WinSCP temp script to open with
@@ -36,11 +36,27 @@ EOF
 	rm -f "$winscp_script"
 }
 
+# opens PuTTY terminal to desired directory
+function open_putty() {
+	# check for correct args
+	if [[ "$#" -ne 3 ]]; then
+		echo "Bad arguments passed to open_putty()."
+		return;
+	fi
+	local username="$1"
+	local password="$2"
+	local hostname="${CLASS}.${URL}"
+	local dir_name="$3"
+	local dir_path="${REMOTE_PATH_PREFIX}${CLASS}/${dir_name}/"
+	plink -t -batch "${username}@${hostname}" -pw "${password}" "cd ${dir_path} && export PS1='[${username}@${hostname}] (plink)$ ' && bash"
+	echo -e "Remote connection terminated.\n"
+}
+
 # Main logic
 function main() {
 	# check for correct args
 	if [[ "$#" -ne 1 ]]; then
-		echo "usage: wcsp <directory_name>"
+		echo "Usage: wcsp <directory_name>"
 		return;
 	fi
 	local dir_name="$1"
@@ -66,9 +82,25 @@ function main() {
 	echo
 	echo "Searching for constants in ~/.bashrc."
 	source ~/.bashrc
+
 	echo "Preparing to open WinSCP..."
+
+	# transfer files to WinSCP
 	transfer_to_winscp "${username}" "${password}" "${dir_name}"
-	echo "File transfer complete. Don't forget to close off any connections when you're done!"
+
+	# open PuTTY, if desired
+	printf "Would you like to open ${remote_path}${dir_name} in PuTTY? [y/n]: "
+	read -r putty_ans
+	case "$putty_ans" in
+		"y")
+			echo "Opening PuTTY terminal..."
+			open_putty "${username}" "${password}" "${remote_path}${dir_name}" ;;
+		"n")
+			echo "PuTTY terminal will not open." ;;
+		*)
+			echo "Invalid input. Terminating..." ;;
+	esac
+	echo "All processes complete."
 }
 
 main "$@"
