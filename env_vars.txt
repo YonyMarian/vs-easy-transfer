@@ -1,0 +1,3 @@
+CLASS="cs32"
+URL_TAIL="seas.ucla.edu"
+REMOTE_PATH_PREFIX="/w/home.11/home/yonymarian/"
