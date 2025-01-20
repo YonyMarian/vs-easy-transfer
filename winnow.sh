@@ -28,16 +28,19 @@ function winnow() {
 		cp -t "${target}/" "${source}/"*"${file_ext}" || echo -e "\tNo ${file_ext} files found in ${source}"
 	done
 	echo -e "Copied available requested filetypes to ${target}"
-	read -p "Would you like to add ${target} to git? [y/n] : " git_ans
-	case "$git_ans" in
-		"y")
-			git add "${target}"
-			git status ;;
-		"n")
-			echo "Git will not track these changes." ;;
-		*)
-			echo "Did not detect valid input. Nothing was added to git." ;;
-	esac
+	if [[ -d ".git" ]]; then
+		read -p "Would you like to add ${target} to git? [y/n] : " git_ans
+		case "$git_ans" in
+			"y")
+				git add "${target}"
+				git status ;;
+			"n")
+				echo "Git will not track these changes." ;;
+			*)
+				echo "Did not detect valid input. Nothing was added to git." ;;
+		esac
+	fi
+	echo "File transfer complete."
 }
 
 winnow "$@"
